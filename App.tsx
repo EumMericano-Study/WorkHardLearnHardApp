@@ -100,11 +100,18 @@ const styles = StyleSheet.create({
     fontSize: 18,
     paddingVertical: 15,
     paddingHorizontal: 20,
-    marginTop: 20,
+    marginVertical: 20,
     borderRadius: 30,
   },
-  toDo: {},
+  toDo: {
+    backgroundColor: COLOR.DARK_GREY,
+    paddingVertical: 20,
+    paddingHorizontal: 40,
+    marginBottom: 10,
+    borderRadius: 15,
+  },
   toDoText: {
+    fontSize: 16,
     color: COLOR.WHITE,
   },
 });
