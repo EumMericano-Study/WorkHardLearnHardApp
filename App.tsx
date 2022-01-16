@@ -22,11 +22,7 @@ export default function App() {
 
     // 해싱 테이블에서 Date.now()가 키값으로 작동
     // Object.assign을 통해 객체를 합침
-    setToDos(
-      Object.assign({}, toDos, {
-        [Date.now()]: { text, work: working },
-      })
-    );
+    setToDos({ ...toDos, [Date.now()]: { text, work: working } });
     setText("");
   };
   return (
