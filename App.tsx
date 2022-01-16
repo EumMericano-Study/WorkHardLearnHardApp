@@ -58,9 +58,10 @@ export default function App() {
   };
   const deleteToDo = async (key: number) => {
     Alert.alert("ToDo를 삭제합니다", "동의하십니까?", [
-      { text: "취소" },
+      { text: "취소", style: "cancel" },
       {
         text: "삭제",
+        style: "destructive",
         onPress: () => {
           const newToDos = { ...toDos };
           delete newToDos[key];
