@@ -7,8 +7,10 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
+  Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Fontisto } from "@expo/vector-icons";
 import { COLOR, FONT_WEIGHT } from "./constants";
 
 interface toDoListState {
@@ -53,6 +55,24 @@ export default function App() {
       console.log(e);
     }
     setText("");
+  };
+  const deleteToDo = async (key: number) => {
+    Alert.alert("ToDo를 삭제합니다", "동의하십니까?", [
+      { text: "취소" },
+      {
+        text: "삭제",
+        onPress: () => {
+          const newToDos = { ...toDos };
+          delete newToDos[key];
+          setToDos(newToDos);
+          try {
+            saveToLocalStorage(newToDos);
+          } catch (e) {
+            console.log(e);
+          }
+        },
+      },
+    ]);
   };
 
   useEffect(() => {
@@ -99,6 +119,9 @@ export default function App() {
           toDos[parseInt(key)].working === working ? (
             <View style={styles.toDo} key={key}>
               <Text style={styles.toDoText}>{toDos[parseInt(key)].text}</Text>
+              <TouchableOpacity onPress={() => deleteToDo(parseInt(key))}>
+                <Fontisto name="trash" size={18} color={COLOR.GREY} />
+              </TouchableOpacity>
             </View>
           ) : null
         )}
@@ -131,6 +154,9 @@ const styles = StyleSheet.create({
     borderRadius: 30,
   },
   toDo: {
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexDirection: "row",
     backgroundColor: COLOR.DARK_GREY,
     paddingVertical: 20,
     paddingHorizontal: 40,
