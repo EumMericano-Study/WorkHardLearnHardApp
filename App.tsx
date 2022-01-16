@@ -8,6 +8,7 @@ import {
     TextInput,
     ScrollView,
     Alert,
+    Platform,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Fontisto } from "@expo/vector-icons";
@@ -57,23 +58,37 @@ export default function App() {
         setText("");
     };
     const deleteToDo = async (key: number) => {
-        Alert.alert("ToDo를 삭제합니다", "동의하십니까?", [
-            { text: "취소", style: "cancel" },
-            {
-                text: "삭제",
-                style: "destructive",
-                onPress: () => {
-                    const newToDos = { ...toDos };
-                    delete newToDos[key];
-                    setToDos(newToDos);
-                    try {
-                        saveToLocalStorage(newToDos);
-                    } catch (e) {
-                        console.log(e);
-                    }
+        if (Platform.OS === "web") {
+            const ok = confirm("ToDo를 삭제합니다");
+            if (ok) {
+                const newToDos = { ...toDos };
+                delete newToDos[key];
+                setToDos(newToDos);
+                try {
+                    saveToLocalStorage(newToDos);
+                } catch (e) {
+                    console.log(e);
+                }
+            }
+        } else {
+            Alert.alert("ToDo를 삭제합니다", "동의하십니까?", [
+                { text: "취소", style: "cancel" },
+                {
+                    text: "삭제",
+                    style: "destructive",
+                    onPress: () => {
+                        const newToDos = { ...toDos };
+                        delete newToDos[key];
+                        setToDos(newToDos);
+                        try {
+                            saveToLocalStorage(newToDos);
+                        } catch (e) {
+                            console.log(e);
+                        }
+                    },
                 },
-            },
-        ]);
+            ]);
+        }
     };
 
     useEffect(() => {
