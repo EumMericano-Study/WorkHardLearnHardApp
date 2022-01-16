@@ -6,13 +6,22 @@ import {
   View,
   TouchableOpacity,
   TextInput,
+  ScrollView,
 } from "react-native";
 import { COLOR, FONT_WEIGHT } from "./constants";
+
+interface toDoListState {
+  [index: number]: toDoState;
+}
+interface toDoState {
+  text: string;
+  work: boolean;
+}
 
 export default function App() {
   const [working, setWorking] = useState<boolean>(true);
   const [text, setText] = useState<string>("");
-  const [toDos, setToDos] = useState({});
+  const [toDos, setToDos] = useState<toDoListState>({});
   const setToLearn = () => setWorking(false);
   const setToWork = () => setWorking(true);
 
@@ -33,7 +42,7 @@ export default function App() {
           <Text
             style={{
               ...styles.btnText,
-              color: working ? COLOR.WHITE : COLOR.GREY,
+              color: working ? COLOR.WHITE : COLOR.DARK_GREY,
             }}
           >
             Work
@@ -43,7 +52,7 @@ export default function App() {
           <Text
             style={{
               ...styles.btnText,
-              color: working ? COLOR.GREY : COLOR.WHITE,
+              color: working ? COLOR.DARK_GREY : COLOR.WHITE,
             }}
           >
             Learn
@@ -60,6 +69,13 @@ export default function App() {
           returnKeyType="done"
         />
       </View>
+      <ScrollView>
+        {Object.keys(toDos).map((key) => (
+          <View style={styles.toDo} key={key}>
+            <Text style={styles.toDoText}>{toDos[parseInt(key)].text}</Text>
+          </View>
+        ))}
+      </ScrollView>
     </View>
   );
 }
@@ -86,5 +102,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginTop: 20,
     borderRadius: 30,
+  },
+  toDo: {},
+  toDoText: {
+    color: COLOR.WHITE,
   },
 });
