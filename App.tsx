@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
@@ -8,6 +8,7 @@ import {
   TextInput,
   ScrollView,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { COLOR, FONT_WEIGHT } from "./constants";
 
 interface toDoListState {
@@ -15,8 +16,10 @@ interface toDoListState {
 }
 interface toDoState {
   text: string;
-  work: boolean;
+  working: boolean;
 }
+
+const STORAGE_KEY = "@toDos";
 
 export default function App() {
   const [working, setWorking] = useState<boolean>(true);
@@ -26,14 +29,36 @@ export default function App() {
   const setToWork = () => setWorking(true);
 
   const onChangeText = (payload: string) => setText(payload);
-  const addToDo = () => {
+  const saveToLocalStorage = async (toDos: toDoListState) =>
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(toDos));
+  const loadToDos = async () => {
+    try {
+      const loadedData = await AsyncStorage.getItem(STORAGE_KEY);
+      setToDos(JSON.parse(loadedData) as toDoListState);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const addToDo = async () => {
     if (text === "") return;
 
+    const newToDos = { ...toDos, [Date.now()]: { text, working } };
     // 해싱 테이블에서 Date.now()가 키값으로 작동
     // Object.assign을 통해 객체를 합침
-    setToDos({ ...toDos, [Date.now()]: { text, work: working } });
+    setToDos(newToDos);
+    try {
+      await saveToLocalStorage(newToDos);
+    } catch (e) {
+      console.log(e);
+    }
     setText("");
   };
+
+  useEffect(() => {
+    loadToDos();
+  }, []);
+
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
@@ -70,11 +95,13 @@ export default function App() {
         />
       </View>
       <ScrollView>
-        {Object.keys(toDos).map((key) => (
-          <View style={styles.toDo} key={key}>
-            <Text style={styles.toDoText}>{toDos[parseInt(key)].text}</Text>
-          </View>
-        ))}
+        {Object.keys(toDos).map((key) =>
+          toDos[parseInt(key)].working === working ? (
+            <View style={styles.toDo} key={key}>
+              <Text style={styles.toDoText}>{toDos[parseInt(key)].text}</Text>
+            </View>
+          ) : null
+        )}
       </ScrollView>
     </View>
   );
